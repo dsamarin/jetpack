@@ -29,7 +29,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
 
 		add_action( 'deleted_user', $callable, 10, 2 );
-		add_action( 'remove_user_from_blog', $callable, 10, 2 );
+		//add_action( 'remove_user_from_blog', $callable, 10, 2 );
+		add_action( 'remove_user_from_blog', array( $this, 'foo'), 10, 2 );
+
 
 		// user roles
 		add_action( 'add_user_role', array( $this, 'save_user_role_handler' ), 10, 2 );
@@ -46,6 +48,11 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'wp_login_failed', $callable, 10, 2 );
 		add_action( 'wp_logout', $callable, 10, 0 );
 		add_action( 'wp_masterbar_logout', $callable, 10, 0 );
+	}
+
+	public function foo( $user_id, $blog_id ) {
+		$b = debug_backtrace(false);
+		error_log(print_r($b, true));
 	}
 
 	public function init_full_sync_listeners( $callable ) {
