@@ -56,7 +56,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	public function init_before_send() {
 		add_filter( 'jetpack_sync_before_send_jetpack_sync_add_user', array( $this, 'expand_user' ) );
 		add_filter( 'jetpack_sync_before_send_jetpack_sync_register_user', array( $this, 'expand_user' ) );
-		add_filter( 'jetpack_sync_before_send_jetpack_sync_save_user', array( $this, 'expand_user' ) );
+		add_filter( 'jetpack_sync_before_send_jetpack_sync_save_user', array( $this, 'expand_user' ), 10, 2 );
 		add_filter( 'jetpack_sync_before_send_wp_login', array( $this, 'expand_login_username' ), 10, 1 );
 		add_filter( 'jetpack_sync_before_send_wp_logout', array( $this, 'expand_logout_username' ), 10, 2 );
 
@@ -97,6 +97,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	public function expand_user( $args ) {
 		list( $user ) = $args;
+
 
 		if ( $user ) {
 			return array( $this->add_to_user( $user ) );
@@ -184,7 +185,7 @@ error_log("Doing sync save user");
 
 	function save_user_role_handler( $user_id, $role, $old_roles = null ) {
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
-
+error_log("THE USER!" . print_r($user, true));
 		$was_user_created = $this->is_create_user();
 		/**
 		 * Fires when the client needs to sync an updated user
