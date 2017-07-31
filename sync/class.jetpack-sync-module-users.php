@@ -194,6 +194,8 @@ error_log("Doing sync save user");
 		 */
 		do_action( 'jetpack_sync_save_user', $user );
 error_log("SAVING USER WITHIN ROLE HANDLER " . current_filter());
+		$backtrace = debug_backtrace( false );
+		error_log(print_r($backtrace, true));
 	}
 
 	function maybe_save_user_meta( $meta_id, $user_id, $meta_key, $value ) {
