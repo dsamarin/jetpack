@@ -98,8 +98,10 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	public function expand_user( $args, $is_create_user = false ) {
 		list( $user ) = $args;
 
+		error_log("LISTED USER: " . print_r($user, true));
 		if ( $user ) {
 			$user_data = $this->add_to_user( $user );
+			error_log("user_data " . print_r($user_data, true));
 			$user_data->jetpack_is_create_user = $is_create_user;
 			return array( $user_data );
 		}
