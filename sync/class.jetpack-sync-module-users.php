@@ -100,7 +100,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 		if ( $user ) {
 			$user_data = $this->add_to_user( $user );
-			$user_data['jetpack_is_create_user'] = $is_create_user;
+			$user_data->jetpack_is_create_user = $is_create_user;
 			return array( $user_data );
 		}
 
