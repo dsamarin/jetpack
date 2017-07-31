@@ -192,7 +192,7 @@ error_log("Doing sync save user");
 		 *
 		 * @param object The WP_User object
 		 */
-		do_action( 'jetpack_sync_save_user', $user );
+		do_action( 'jetpack_sync_save_user', $user, $this->is_create_user() );
 error_log("SAVING USER WITHIN ROLE HANDLER " . current_filter());
 		$backtrace = debug_backtrace( false );
 		error_log(print_r($backtrace, true));
@@ -310,9 +310,17 @@ error_log("SAVING USER WITHIN ROLE HANDLER " . current_filter());
 	}
 
 	private function is_add_new_user_to_blog() {
+		return $this->is_function_in_backtrace( 'add_new_user_to_blog' );
+	}
+
+	private function is_create_user() {
+		return $this->is_function_in_backtrace( 'wp_create_user' );
+	}
+
+	private function is_function_in_backtrace( $name ) {
 		$backtrace = debug_backtrace( false );
 		foreach ( $backtrace as $call ) {
-			if ( isset( $call['function'] ) && 'add_new_user_to_blog' === $call['function'] ) {
+			if ( isset( $call['function'] ) && $name === $call['function'] ) {
 				return true;
 			}
 		}
