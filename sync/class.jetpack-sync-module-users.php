@@ -124,6 +124,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
+		error_log("Current filter:" . current_filter() );
 		// ensure we only sync users who are members of the current blog
 		if ( ! is_user_member_of_blog( $user_id, get_current_blog_id() ) ) {
 			return;
@@ -154,7 +155,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_register_user', $user );
-
+error_log("Doing user_register");
 			return;
 		}
 		/* MU Sites add users instead of register them to sites */
@@ -167,7 +168,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_add_user', $user );
-
+error_log("Doing add user");
 			return;
 		}
 		/**
@@ -178,6 +179,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		 * @param object The WP_User object
 		 */
 		do_action( 'jetpack_sync_save_user', $user );
+error_log("Doing sync save user");
 	}
 
 	function save_user_role_handler( $user_id, $role, $old_roles = null ) {
@@ -306,7 +308,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	private function is_add_user() {
 		$backtrace = debug_backtrace( false );
-
 		foreach ( $backtrace as $call ) {
 			if ( isset( $call['function'] ) && 'add_new_user_to_blog' === $call['function'] ) {
 				return true;
