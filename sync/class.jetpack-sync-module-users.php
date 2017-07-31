@@ -23,7 +23,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'add_user_to_blog', array( $this, 'save_user_handler' ) );
 		add_action( 'jetpack_sync_add_user', $callable, 10, 2 );
 		add_action( 'jetpack_sync_register_user', $callable, 10, 2 );
-		add_action( 'jetpack_sync_save_user', $callable, 10, 3 );
+		add_action( 'jetpack_sync_save_user', $callable, 10, 2 );
 
 		add_action( 'jetpack_sync_user_locale', $callable, 10, 2 );
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
@@ -95,14 +95,13 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		return $user;
 	}
 
-	public function expand_user( $args, $is_create_user ) {
+	public function expand_user( $args, $is_create_user = false ) {
 		list( $user ) = $args;
-		error_log("IS CREATE USER: " . $is_create_user);
-		error_log("ARGS: " . print_r($args, true));
 
-error_log("IN EXPAND USER" . print_r($this->add_to_user($user), true));
 		if ( $user ) {
-			return array( $this->add_to_user( $user ) );
+			$user_data = $this->add_to_user( $user );
+			$user_data['jetpack_is_create_user'] = $is_create_user;
+			return array( $user_data );
 		}
 
 		return false;
