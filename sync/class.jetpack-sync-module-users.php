@@ -100,9 +100,10 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 		error_log("LISTED USER: " . print_r($user, true));
 		if ( $user ) {
+			$user->jetpack_is_create_user = $is_create_user;
 			$user_data = $this->add_to_user( $user );
 			error_log("user_data " . print_r($user_data, true));
-			$user_data->jetpack_is_create_user = $is_create_user;
+
 			return array( $user_data );
 		}
 
