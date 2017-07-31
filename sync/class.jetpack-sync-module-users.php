@@ -23,7 +23,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'add_user_to_blog', array( $this, 'save_user_handler' ) );
 		add_action( 'jetpack_sync_add_user', $callable, 10, 2 );
 		add_action( 'jetpack_sync_register_user', $callable, 10, 2 );
-		add_action( 'jetpack_sync_save_user', $callable, 10, 2 );
+		add_action( 'jetpack_sync_save_user', $callable, 10, 3 );
 
 		add_action( 'jetpack_sync_user_locale', $callable, 10, 2 );
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
@@ -185,6 +185,7 @@ error_log("Doing sync save user");
 	function save_user_role_handler( $user_id, $role, $old_roles = null ) {
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
 
+		$was_user_created = $this->is_create_user();
 		/**
 		 * Fires when the client needs to sync an updated user
 		 *
@@ -192,10 +193,7 @@ error_log("Doing sync save user");
 		 *
 		 * @param object The WP_User object
 		 */
-		do_action( 'jetpack_sync_save_user', $user, $this->is_create_user() );
-error_log("SAVING USER WITHIN ROLE HANDLER " . current_filter());
-		$backtrace = debug_backtrace( false );
-		error_log(print_r($backtrace, true));
+		do_action( 'jetpack_sync_save_user', $user, $was_user_created );
 	}
 
 	function maybe_save_user_meta( $meta_id, $user_id, $meta_key, $value ) {
