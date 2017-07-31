@@ -29,9 +29,8 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
 
 		add_action( 'deleted_user', $callable, 10, 2 );
-		//add_action( 'remove_user_from_blog', $callable, 10, 2 );
-		add_action( 'remove_user_from_blog', array( $this, 'foo'), 10, 2 );
-
+		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 2 );
+		add_action( 'jetpack_remove_user_from_blog', $callable, 10, 3 );
 
 		// user roles
 		add_action( 'add_user_role', array( $this, 'save_user_role_handler' ), 10, 2 );
@@ -48,11 +47,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'wp_login_failed', $callable, 10, 2 );
 		add_action( 'wp_logout', $callable, 10, 0 );
 		add_action( 'wp_masterbar_logout', $callable, 10, 0 );
-	}
-
-	public function foo( $user_id, $blog_id ) {
-		$b = debug_backtrace(false);
-		error_log(print_r($b, true));
 	}
 
 	public function init_full_sync_listeners( $callable ) {
@@ -97,6 +91,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 				$user->locale = get_user_locale( $user->ID );
 			}
 		}
+
 		return $user;
 	}
 
@@ -121,7 +116,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		$user  = get_userdata( $user_id );
 		$user  = $this->sanitize_user( $user );
 		$login = '';
-		if( is_object( $user ) && is_object( $user->data ) ) {
+		if ( is_object( $user ) && is_object( $user->data ) ) {
 			$login = $user->data->user_login;
 		}
 
@@ -159,6 +154,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_register_user', $user );
+
 			return;
 		}
 		/* MU Sites add users instead of register them to sites */
@@ -171,6 +167,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_add_user', $user );
+
 			return;
 		}
 		/**
@@ -233,7 +230,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			return;
 		}
 
-		$user =  get_user_by( 'id', $user_id );
+		$user = get_user_by( 'id', $user_id );
 		if ( $meta_key === $user->cap_key ) {
 			/**
 			 * Fires when the client needs to sync an updated user
@@ -248,6 +245,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	public function enqueue_full_sync_actions( $config, $max_items_to_enqueue, $state ) {
 		global $wpdb;
+
 		return $this->enqueue_all_ids_as_action( 'jetpack_full_sync_users', $wpdb->usermeta, 'user_id', $this->get_where_sql( $config ), $max_items_to_enqueue, $state );
 	}
 
@@ -298,5 +296,25 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		$user_ids = $args[0];
 
 		return array_map( array( $this, 'sanitize_user_and_expand' ), get_users( array( 'include' => $user_ids ) ) );
+	}
+
+	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
+		if ( ! $this->is_add_user() ) {
+			do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id );
+		}
+	}
+
+	private function is_add_user() {
+		$backtrace = debug_backtrace();
+		error_log(print_r($backtrace, true));
+		/*
+		foreach ( $backtrace as $call ) {
+			if ( isset( $call['args'][0] ) && 'after_switch_theme' === $call['args'][0] ) {
+				return true;
+			}
+		}
+
+		return false;
+		*/
 	}
 }
