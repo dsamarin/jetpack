@@ -305,16 +305,14 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	private function is_add_user() {
-		$backtrace = debug_backtrace();
-		error_log(print_r($backtrace, true));
-		/*
+		$backtrace = debug_backtrace( false );
+
 		foreach ( $backtrace as $call ) {
-			if ( isset( $call['args'][0] ) && 'after_switch_theme' === $call['args'][0] ) {
+			if ( isset( $call['function'] ) && 'add_new_user_to_blog' === $call['function'] ) {
 				return true;
 			}
 		}
 
 		return false;
-		*/
 	}
 }
