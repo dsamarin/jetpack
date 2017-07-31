@@ -98,11 +98,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	public function expand_user( $args, $is_create_user = false ) {
 		list( $user ) = $args;
 
-		error_log("LISTED USER: " . print_r($user, true));
 		if ( $user ) {
 			$user->jetpack_is_create_user = $is_create_user;
 			$user_data = $this->add_to_user( $user );
-			error_log("user_data " . print_r($user_data, true));
 
 			return array( $user_data );
 		}
@@ -129,7 +127,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
-		error_log("Current filter:" . current_filter() );
 		// ensure we only sync users who are members of the current blog
 		if ( ! is_user_member_of_blog( $user_id, get_current_blog_id() ) ) {
 			return;
@@ -160,7 +157,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_register_user', $user );
-error_log("Doing user_register");
 			return;
 		}
 		/* MU Sites add users instead of register them to sites */
@@ -173,7 +169,6 @@ error_log("Doing user_register");
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_add_user', $user );
-error_log("Doing add user");
 			return;
 		}
 		/**
@@ -184,12 +179,10 @@ error_log("Doing add user");
 		 * @param object The WP_User object
 		 */
 		do_action( 'jetpack_sync_save_user', $user );
-error_log("Doing sync save user");
 	}
 
 	function save_user_role_handler( $user_id, $role, $old_roles = null ) {
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
-error_log("THE USER!" . print_r($user, true));
 		$was_user_created = $this->is_create_user();
 		/**
 		 * Fires when the client needs to sync an updated user
