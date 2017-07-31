@@ -193,6 +193,7 @@ error_log("Doing sync save user");
 		 * @param object The WP_User object
 		 */
 		do_action( 'jetpack_sync_save_user', $user );
+error_log("SAVING USER WITHIN ROLE HANDLER");
 	}
 
 	function maybe_save_user_meta( $meta_id, $user_id, $meta_key, $value ) {
