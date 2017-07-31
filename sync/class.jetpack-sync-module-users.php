@@ -98,7 +98,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	public function expand_user( $args ) {
 		list( $user ) = $args;
 
-
+error_log("IN EXPAND USER" . print_r($this->add_to_user($user), true));
 		if ( $user ) {
 			return array( $this->add_to_user( $user ) );
 		}
