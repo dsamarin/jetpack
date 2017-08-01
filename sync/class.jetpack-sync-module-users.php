@@ -329,7 +329,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	private function is_delete_user_from_network() {
-		return $this->is_function_in_backtrace( 'remove_user_from_blog', '/public_html/wp-admin/network/users.php' );
+		return $this->is_function_in_backtrace( 'wpmu_delete_user', '/public_html/wp-admin/network/users.php' );
 	}
 
 	private function is_function_in_backtrace( $name, $file = '' ) {
