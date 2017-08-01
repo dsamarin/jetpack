@@ -301,8 +301,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
 		$backtrace = debug_backtrace( false );
-		error_log(print_r($backtrace, true));
-		if ( ! $this->is_add_new_user_to_blog() ) {
+		if ( ! $this->is_add_new_user_to_blog() && ! $this->is_delete_user_from_network() ) {
 			do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id );
 		}
 	}
@@ -315,9 +314,16 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		return $this->is_function_in_backtrace( 'wp_create_user' );
 	}
 
-	private function is_function_in_backtrace( $name ) {
+	private function is_delete_user_from_network() {
+		return $this->is_function_in_backtrace( 'remove_user_from_blog', '/public_html/wp-admin/network/users.php' );
+	}
+
+	private function is_function_in_backtrace( $name, $file = '' ) {
 		$backtrace = debug_backtrace( false );
 		foreach ( $backtrace as $call ) {
+			if ( $file && false === strpos( $call['file'], $file ) ) {
+				continue;
+			}
 			if ( isset( $call['function'] ) && $name === $call['function'] ) {
 				return true;
 			}
