@@ -31,7 +31,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 		add_action( 'deleted_user', array( $this, 'deleted_user_handler'), 10, 2 );
 		add_action( 'jetpack_deleted_user', $callable, 10, 3 );
-		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 2 );
+		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 3 );
 		add_action( 'jetpack_remove_user_from_blog', $callable, 10, 4 );
 
 		// user roles
