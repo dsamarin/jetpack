@@ -52,13 +52,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
-		error_log("IS DELETE_USER FROM NETWORK? " . $this->is_delete_user_from_network() ? 'T' : 'F');
-		$is_delete_user_from_network = $this->is_delete_user_from_network();
-		error_log($is_delete_user_from_network);
-		if ($is_delete_user_from_network) error_log("TRUE"); else error_log("FALSE");
-		$b = debug_backtrace(true);
-		error_log(print_r($b, true));
-		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $is_delete_user_from_network );
+		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $this->is_delete_user_from_network() );
 	}
 
 	public function init_full_sync_listeners( $callable ) {
