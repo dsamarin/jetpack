@@ -300,6 +300,8 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
+		$backtrace = debug_backtrace( false );
+		error_log(print_r($backtrace, true));
 		if ( ! $this->is_add_new_user_to_blog() ) {
 			do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id );
 		}
