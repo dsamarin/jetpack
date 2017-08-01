@@ -28,8 +28,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'jetpack_sync_user_locale', $callable, 10, 2 );
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
 
-		//add_action( 'deleted_user', $callable, 10, 2 );
-add_action( 'deleted_user', array( $this, 'pdel'), 10, 2 );
+
+		add_action( 'deleted_user', array( $this, 'deleted_user_handler'), 10, 2 );
+		add_action( 'jetpack_deleted_user', $callable, 10, 2 );
 		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 2 );
 		add_action( 'jetpack_remove_user_from_blog', $callable, 10, 3 );
 
@@ -50,9 +51,12 @@ add_action( 'deleted_user', array( $this, 'pdel'), 10, 2 );
 		add_action( 'wp_masterbar_logout', $callable, 10, 0 );
 	}
 
-	public function pdel( $a, $b) {
-		error_log(print_r($a, true));
-		error_log(print_r($b, true));
+	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
+		if ( empty( $reassign_user_id ) && isset( $this->reassign_user ) ) {
+			$reassign_user_id = $this->reassign_user;
+			$this->reassign_user = null;
+		}
+		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id );
 	}
 
 	public function init_full_sync_listeners( $callable ) {
@@ -305,11 +309,24 @@ add_action( 'deleted_user', array( $this, 'pdel'), 10, 2 );
 		return array_map( array( $this, 'sanitize_user_and_expand' ), get_users( array( 'include' => $user_ids ) ) );
 	}
 
-	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
+	public function remove_user_from_blog_handler( $user_id, $blog_id, $reassign_user = '' ) {
 		$backtrace = debug_backtrace( false );
-		if ( ! $this->is_add_new_user_to_blog() && ! $this->is_delete_user_from_network() ) {
-			do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id );
+
+		//Don't send remove_user_from_blog sync action when we're adding a user
+		if ( $this->is_add_new_user_to_blog() ) {
+			return;
 		}
+
+		//Don't send remove_user_from_blog sync action when deleting a user from network
+		//Capture $reassign_user so it can be sent with delete_user sync action
+		if ( $this->is_delete_user_from_network() ) {
+			if ( ! empty ( $reassign_user ) ) {
+				$this->reassign_user = $reassign_user;
+			}
+			return;
+		}
+
+		do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id );
 	}
 
 	private function is_add_new_user_to_blog() {
