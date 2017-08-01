@@ -55,6 +55,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		error_log("IS DELETE_USER FROM NETWORK? " . $this->is_delete_user_from_network() ? 'T' : 'F');
 		$is_delete_user_from_network = $this->is_delete_user_from_network();
 		error_log($is_delete_user_from_network);
+		if ($is_delete_user_from_network) error_log("TRUE"); else error_log("FALSE");
 		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $is_delete_user_from_network );
 	}
 
