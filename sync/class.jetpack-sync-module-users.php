@@ -30,9 +30,12 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 
 		add_action( 'deleted_user', array( $this, 'deleted_user_handler' ), 10, 2 );
-		add_action( 'jetpack_deleted_user', $callable, 10, 3 );
-		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 3 );
-		add_action( 'jetpack_remove_user_from_blog', $callable, 10, 4 );
+		add_action( 'jetpack_deleted_user', $callable );
+		add_action( 'jetpack_deleted_user_reassigned', $callable, 10, 2 );
+		add_action( 'jetpack_deleted_user_from_network', $callable );
+		add_action( 'jetpack_deleted_user_from_network_reassigned', $callable, 10, 2 );
+		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 2 );
+		add_action( 'jetpack_removed_user_from_blog', $callable, 10, 2 );
 
 		// user roles
 		add_action( 'add_user_role', array( $this, 'save_user_role_handler' ), 10, 2 );
@@ -128,17 +131,19 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		return array( $login, $user );
 	}
 
-	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
-		$b = debug_backtrace(false);
-		error_log(print_r($b, true));
-		error_log("RE: " . $reassign_user_id . " NET: " . $this->get_reassigned_network_user_id());
-		$details = array(
-			'is_network'       => $this->is_delete_user_from_network(),
-			'reassign_user_id' => $reassign_user_id ? $reassign_user_id : $this->get_reassigned_network_user_id(),
-		);
+	public function deleted_user_handler( $deleted_user_id, $reassigned_user_id = '' ) {
+		if ( $this->is_delete_user_from_network() ) {
+			return;
+		}
 
-		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $details );
+		if ( ! $reassigned_user_id ) {
+			do_action( 'jetpack_deleted_user', $deleted_user_id );
+			return;
+		}
+
+		do_action( 'jetpack_deleted_user_reassigned', $deleted_user_id, $reassigned_user_id );
 	}
+
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
 		// ensure we only sync users who are members of the current blog
@@ -315,17 +320,24 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		return array_map( array( $this, 'sanitize_user_and_expand' ), get_users( array( 'include' => $user_ids ) ) );
 	}
 
-	public function remove_user_from_blog_handler( $user_id, $blog_id, $reassign_user = '' ) {
-		$backtrace = debug_backtrace( false );
-		error_log( print_r( $backtrace, true ) );
-		$backtrace = debug_backtrace();
-		error_log( print_r( $backtrace, true ) );
-		//Don't send remove_user_from_blog sync action when we're adding a user
+	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
+		//User removed on add, see https://github.com/WordPress/WordPress/blob/0401cee8b36df3def8e807dd766adc02b359dfaf/wp-includes/ms-functions.php#L2114
 		if ( $this->is_add_new_user_to_blog() ) {
 			return;
 		}
 
-		do_action( 'jetpack_remove_user_from_blog', $user_id, $blog_id, $reassign_user, $this->is_delete_user_from_network() );
+		if ( ! $this->is_delete_user_from_network() ) {
+			do_action( 'jetpack_removed_user_from_blog', $user_id, $blog_id );
+			return;
+		}
+
+		$reassigned_user_id = $this->get_reassigned_network_user_id();
+		if ( ! $reassigned_user_id ) {
+			do_action( 'jetpack_deleted_user_from_network', $user_id );
+			return;
+		}
+
+		do_action( 'jetpack_deleted_user_from_network_reassigned', $user_id, $reassigned_user_id );
 	}
 
 	private function is_add_new_user_to_blog() {
