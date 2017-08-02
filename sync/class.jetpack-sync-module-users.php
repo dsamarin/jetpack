@@ -370,6 +370,8 @@ error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
 
 	private function is_function_in_backtrace( $name, $file = '' ) {
 		$backtrace = debug_backtrace( false );
+		error_log("inside is_function_in_backtrace");
+		error_log(print_r($backtrace, true));
 		foreach ( $backtrace as $call ) {
 			if ( $file && false === strpos( $call['file'], $file ) ) {
 error_log("could not find $file in {$call['file']}, skipping \n");
