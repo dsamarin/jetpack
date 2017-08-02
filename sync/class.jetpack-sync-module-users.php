@@ -129,6 +129,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
+		error_log("RE: " . $reassign_user_id . " NET: " . $this->get_reassigned_network_user_id());
 		$details = array(
 			'is_network'       => $this->is_delete_user_from_network(),
 			'reassign_user_id' => $reassign_user_id ? $reassign_user_id : $this->get_reassigned_network_user_id(),
