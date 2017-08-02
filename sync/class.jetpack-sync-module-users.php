@@ -29,7 +29,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
 
 
-		add_action( 'deleted_user', array( $this, 'deleted_user_handler'), 10, 2 );
+		add_action( 'deleted_user', array( $this, 'deleted_user_handler' ), 10, 2 );
 		add_action( 'jetpack_deleted_user', $callable, 10, 3 );
 		add_action( 'remove_user_from_blog', array( $this, 'remove_user_from_blog_handler' ), 10, 3 );
 		add_action( 'jetpack_remove_user_from_blog', $callable, 10, 4 );
@@ -49,10 +49,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'wp_login_failed', $callable, 10, 2 );
 		add_action( 'wp_logout', $callable, 10, 0 );
 		add_action( 'wp_masterbar_logout', $callable, 10, 0 );
-	}
-
-	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
-		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $this->is_delete_user_from_network() );
 	}
 
 	public function init_full_sync_listeners( $callable ) {
@@ -106,7 +102,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 		if ( $user ) {
 			$user->jetpack_is_create_user = $is_create_user;
-			$user_data = $this->add_to_user( $user );
+			$user_data                    = $this->add_to_user( $user );
 
 			return array( $user_data );
 		}
@@ -130,6 +126,15 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		}
 
 		return array( $login, $user );
+	}
+
+	public function deleted_user_handler( $deleted_user_id, $reassign_user_id = '' ) {
+		$details = array(
+			'is_network'       => $this->is_delete_user_from_network(),
+			'reassign_user_id' => $reassign_user_id ? $reassign_user_id : $this->get_reassigned_network_user_id(),
+		);
+
+		do_action( 'jetpack_deleted_user', $deleted_user_id, $reassign_user_id, $details );
 	}
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
@@ -163,6 +168,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_register_user', $user );
+
 			return;
 		}
 		/* MU Sites add users instead of register them to sites */
@@ -175,6 +181,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			 * @param object The WP_User object
 			 */
 			do_action( 'jetpack_sync_add_user', $user );
+
 			return;
 		}
 		/**
@@ -188,7 +195,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	function save_user_role_handler( $user_id, $role, $old_roles = null ) {
-		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
+		$user             = $this->sanitize_user( get_user_by( 'id', $user_id ) );
 		$was_user_created = $this->is_create_user();
 		/**
 		 * Fires when the client needs to sync an updated user
@@ -307,9 +314,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	public function remove_user_from_blog_handler( $user_id, $blog_id, $reassign_user = '' ) {
 		$backtrace = debug_backtrace( false );
-		error_log(print_r($backtrace, true));
+		error_log( print_r( $backtrace, true ) );
 		$backtrace = debug_backtrace();
-		error_log(print_r($backtrace, true));
+		error_log( print_r( $backtrace, true ) );
 		//Don't send remove_user_from_blog sync action when we're adding a user
 		if ( $this->is_add_new_user_to_blog() ) {
 			return;
@@ -327,7 +334,21 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	private function is_delete_user_from_network() {
-		return $this->is_function_in_backtrace( 'wpmu_delete_user', '/public_html/wp-admin/network/users.php' );
+		return $this->is_function_in_backtrace( 'wpmu_delete_user', '/wp-admin/network/users.php' );
+	}
+
+	private function get_reassigned_network_user_id() {
+		$backtrace = debug_backtrace( false );
+		foreach ( $backtrace as $call ) {
+			if (
+				false !== strpos( $call['file'], '/wp-admin/network/users.php' ) &&
+				'remove_user_from_blog' === $call['function'] &&
+				3 === count( $call['args'] )
+			) {
+				return $call['args'][2];
+			}
+		}
+		return false;
 	}
 
 	private function is_function_in_backtrace( $name, $file = '' ) {
