@@ -331,12 +331,16 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			return;
 		}
 
+else error_log("is delete from network, continuing");
+
 		$reassigned_user_id = $this->get_reassigned_network_user_id();
 		if ( ! $reassigned_user_id ) {
+
+error_log("NO REASSIGNED FIRING jetpack_deleted_user_from_network")	;
 			do_action( 'jetpack_deleted_user_from_network', $user_id );
 			return;
 		}
-
+error_log("YES REASSIGNED FIRING jetpack_deleted_user_from_network_reassigned")	;
 		do_action( 'jetpack_deleted_user_from_network_reassigned', $user_id, $reassigned_user_id );
 	}
 
