@@ -372,13 +372,15 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		$backtrace = debug_backtrace( false );
 		foreach ( $backtrace as $call ) {
 			if ( $file && false === strpos( $call['file'], $file ) ) {
+error_log("could not find $file in {$call['file']}, skipping \n");
 				continue;
 			}
 			if ( isset( $call['function'] ) && $name === $call['function'] ) {
 				return true;
 			}
+			else error_log("could not find $name in {$call['function']}, skipping \n");
 		}
-
+error_log("returning false");
 		return false;
 	}
 }
