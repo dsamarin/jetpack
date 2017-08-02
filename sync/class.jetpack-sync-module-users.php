@@ -325,7 +325,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		if ( $this->is_add_new_user_to_blog() ) {
 			return;
 		}
-
+error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
 		if ( ! $this->is_delete_user_from_network() ) {
 			do_action( 'jetpack_removed_user_from_blog', $user_id, $blog_id );
 			return;
@@ -376,6 +376,7 @@ error_log("could not find $file in {$call['file']}, skipping \n");
 				continue;
 			}
 			if ( isset( $call['function'] ) && $name === $call['function'] ) {
+				error_log("RETURNING TRUE!\n");
 				return true;
 			}
 			else error_log("could not find $name in {$call['function']}, skipping \n");
