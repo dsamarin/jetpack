@@ -325,7 +325,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		if ( $this->is_add_new_user_to_blog() ) {
 			return;
 		}
-error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
+
 		if ( ! $this->is_delete_user_from_network() ) {
 			do_action( 'jetpack_removed_user_from_blog', $user_id, $blog_id );
 			return;
@@ -350,8 +350,7 @@ error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
 
 	private function is_delete_user_from_network() {
 		$b = debug_backtrace(false);
-		error_log(print_r($b, true));
-		return $this->is_function_in_backtrace( 'wpmu_delete_user', '/wp-admin/network/users.php' );
+		return $this->is_function_in_backtrace( 'remove_user_from_blog', '/wp-admin/network/users.php' );
 	}
 
 	private function get_reassigned_network_user_id() {
@@ -370,23 +369,14 @@ error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
 
 	private function is_function_in_backtrace( $name, $file = '' ) {
 		$backtrace = debug_backtrace( false );
-		error_log("inside is_function_in_backtrace");
-		error_log(print_r($backtrace, true));
 		foreach ( $backtrace as $call ) {
-			error_log(print_r($call, true));
 			if ( $file && false === strpos( $call['file'], $file ) ) {
-error_log("could not find $file in {$call['file']}, skipping \n");
 				continue;
 			}
-			else error_log("FOUND $file!!!");
-			error_log(" Looking for $name in {$call['function']}");
 			if ( $name === $call['function'] ) {
-				error_log("RETURNING TRUE!\n");
 				return true;
 			}
-			else error_log("could not find $name in {$call['function']}, skipping \n");
 		}
-error_log("returning false");
 		return false;
 	}
 }
