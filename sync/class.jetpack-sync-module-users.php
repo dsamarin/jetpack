@@ -377,7 +377,9 @@ error_log("TESTING IF IS DELETE FROM NETWORK!\n\n\n");
 error_log("could not find $file in {$call['file']}, skipping \n");
 				continue;
 			}
-			if ( isset( $call['function'] ) && $name === $call['function'] ) {
+			else error_log("FOUND $file!!!");
+			error_log(" Looking for $name in {$call['function']}");
+			if ( $name === $call['function'] ) {
 				error_log("RETURNING TRUE!\n");
 				return true;
 			}
