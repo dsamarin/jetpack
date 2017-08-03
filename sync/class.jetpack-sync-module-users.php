@@ -347,7 +347,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 		$this->triggered_network_user_delete_from_remove_from_blog = true;
 
-
 		$reassigned_user_id = $this->get_reassigned_network_user_id();
 		if ( ! $reassigned_user_id ) {
 			do_action( 'jetpack_deleted_user_from_network', $user_id );
