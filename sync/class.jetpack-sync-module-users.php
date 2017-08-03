@@ -134,7 +134,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	public function deleted_user_handler( $deleted_user_id, $reassigned_user_id = '' ) {
 		if ( $this->is_delete_user_from_network() ) {
 			error_log("user $deleted_user_id posts: " . count_user_posts($deleted_user_id));
-			if ( 0 === count_user_posts( $deleted_user_id ) ) {
+			if ( 0 === (int) count_user_posts( $deleted_user_id ) ) {
 				do_action( 'jetpack_deleted_user_from_network', $deleted_user_id );
 			}
 			return;
