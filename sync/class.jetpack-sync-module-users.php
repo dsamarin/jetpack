@@ -27,9 +27,12 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		add_action( 'jetpack_sync_register_user', $callable, 10, 2 );
 		add_action( 'jetpack_sync_save_user', $callable, 10, 2 );
 
+		//Edit user info, see https://github.com/WordPress/WordPress/blob/c05f1dc805bddcc0e76fd90c4aaf2d9ea76dc0fb/wp-admin/user-edit.php#L126
+		add_action( 'personal_options_update', array( $this, 'user_edited_handler' ) );
+		add_action( 'edit_user_profile_update', array( $this, 'user_edited_handler' ) );
+
 		add_action( 'jetpack_sync_user_locale', $callable, 10, 2 );
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
-
 
 		add_action( 'deleted_user', array( $this, 'deleted_user_handler' ), 10, 2 );
 		add_action( 'jetpack_deleted_user', $callable );
@@ -150,16 +153,17 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		do_action( 'jetpack_deleted_user_reassigned', $deleted_user_id, $reassigned_user_id );
 	}
 
+	public function user_edited_handler( $user_id ) {
+		do_action( 'jetpack_user_edited', $user_id );
+	}
+
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
-		error_log("IN SAVE HANDLER");
 		// ensure we only sync users who are members of the current blog
 		if ( ! is_user_member_of_blog( $user_id, get_current_blog_id() ) ) {
 			return;
 		}
-error_log("OLD USER DASTAS");
-		error_log(print_r($old_user_data, true));
-		error_log("USER OBJECT" . print_r(get_user_by( 'id', $user_id ), true));
+
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
 
 		// Older versions of WP don't pass the old_user_data in ->data
@@ -172,7 +176,6 @@ error_log("OLD USER DASTAS");
 		if ( $old_user !== null ) {
 			unset( $old_user->user_pass );
 			if ( serialize( $old_user ) === serialize( $user->data ) ) {
-error_log("NOTHING GOOD HERE, RETURNING!" . print_r($user, true));
 				return;
 			}
 		}
@@ -331,7 +334,7 @@ error_log("NOTHING GOOD HERE, RETURNING!" . print_r($user, true));
 	}
 
 	public function remove_user_from_blog_handler( $user_id, $blog_id ) {
-		//User removed on add, see https://github.com/WordPress/WordPress/blob/0401cee8b36df3def8e807dd766adc02b359dfaf/wp-includes/ms-functions.php#L2114
+		//User is removed on add, see https://github.com/WordPress/WordPress/blob/0401cee8b36df3def8e807dd766adc02b359dfaf/wp-includes/ms-functions.php#L2114
 		if ( $this->is_add_new_user_to_blog() ) {
 			return;
 		}
@@ -346,12 +349,10 @@ error_log("NOTHING GOOD HERE, RETURNING!" . print_r($user, true));
 
 		$reassigned_user_id = $this->get_reassigned_network_user_id();
 		if ( ! $reassigned_user_id ) {
-
-error_log("NO REASSIGNED FIRING jetpack_deleted_user_from_network")	;
 			do_action( 'jetpack_deleted_user_from_network', $user_id );
 			return;
 		}
-error_log("YES REASSIGNED FIRING jetpack_deleted_user_from_network_reassigned")	;
+
 		do_action( 'jetpack_deleted_user_from_network_reassigned', $user_id, $reassigned_user_id );
 	}
 
