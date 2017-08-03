@@ -155,7 +155,6 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	}
 
 	public function user_edited_handler( $user_id ) {
-		error_log("FIRING jetpack_user_edited");
 		do_action( 'jetpack_user_edited', $user_id );
 	}
 
