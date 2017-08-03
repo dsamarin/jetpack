@@ -136,6 +136,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			$b = debug_backtrace(false);
 			error_log(print_r($b, true));
 			error_log("IS NETWORK DELETE, RETURNING");
+			error_log("User $deleted_user_id posts: " . count_user_posts($deleted_user_id) );
 			return;
 		}
 
