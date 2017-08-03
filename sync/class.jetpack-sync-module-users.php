@@ -30,6 +30,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		//Edit user info, see https://github.com/WordPress/WordPress/blob/c05f1dc805bddcc0e76fd90c4aaf2d9ea76dc0fb/wp-admin/user-edit.php#L126
 		add_action( 'personal_options_update', array( $this, 'user_edited_handler' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'user_edited_handler' ) );
+		add_action( 'jetpack_user_edited', $callable );
 
 		add_action( 'jetpack_sync_user_locale', $callable, 10, 2 );
 		add_action( 'jetpack_sync_user_locale_delete', $callable, 10, 1 );
