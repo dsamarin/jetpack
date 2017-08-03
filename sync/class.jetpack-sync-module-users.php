@@ -158,7 +158,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			return;
 		}
 error_log("OLD USER DASTAS");
-		erorr_log(print_r($old_user_data, true));
+		error_log(print_r($old_user_data, true));
 		error_log("USER OBJECT" . print_r(get_user_by( 'id', $user_id ), true));
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
 
