@@ -3,6 +3,8 @@
 class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 	const MAX_INITIAL_SYNC_USERS = 100;
 
+	private $triggered_network_user_delete_from_remove_from_blog = false;
+
 	function name() {
 		return 'users';
 	}
@@ -133,9 +135,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 	public function deleted_user_handler( $deleted_user_id, $reassigned_user_id = '' ) {
 		if ( $this->is_delete_user_from_network() ) {
-			error_log("user $deleted_user_id posts: " . count_user_posts($deleted_user_id));
-			if ( 0 === (int) count_user_posts( $deleted_user_id ) ) {
+			if ( ! $this->triggered_network_user_delete_from_remove_from_blog ) {
 				do_action( 'jetpack_deleted_user_from_network', $deleted_user_id );
+				$this->triggered_network_user_delete_from_remove_from_blog = false;
 			}
 			return;
 		}
@@ -335,7 +337,8 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 			return;
 		}
 
-else error_log("is delete from network, continuing");
+		$this->triggered_network_user_delete_from_remove_from_blog = true;
+
 
 		$reassigned_user_id = $this->get_reassigned_network_user_id();
 		if ( ! $reassigned_user_id ) {
