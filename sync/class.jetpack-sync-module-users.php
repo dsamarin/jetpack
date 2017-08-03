@@ -157,7 +157,9 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		if ( ! is_user_member_of_blog( $user_id, get_current_blog_id() ) ) {
 			return;
 		}
-
+error_log("OLD USER DASTAS");
+		erorr_log(print_r($old_user_data, true));
+		error_log("USER OBJECT" . print_r(get_user_by( 'id', $user_id ), true));
 		$user = $this->sanitize_user( get_user_by( 'id', $user_id ) );
 
 		// Older versions of WP don't pass the old_user_data in ->data
