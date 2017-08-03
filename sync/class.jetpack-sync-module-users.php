@@ -152,6 +152,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 
 
 	function save_user_handler( $user_id, $old_user_data = null ) {
+		error_log("IN SAVE HANDLER");
 		// ensure we only sync users who are members of the current blog
 		if ( ! is_user_member_of_blog( $user_id, get_current_blog_id() ) ) {
 			return;
