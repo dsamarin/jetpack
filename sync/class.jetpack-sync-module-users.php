@@ -170,6 +170,7 @@ class Jetpack_Sync_Module_Users extends Jetpack_Sync_Module {
 		if ( $old_user !== null ) {
 			unset( $old_user->user_pass );
 			if ( serialize( $old_user ) === serialize( $user->data ) ) {
+error_log("NOTHING GOOD HERE, RETURNING!" . print_r($user, true));
 				return;
 			}
 		}
